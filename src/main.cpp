@@ -1,6 +1,6 @@
-// This example takes heavy inpsiration from the ESP32 example by ronaldstoner
-// Based on the previous work of chipik / _hexway / ECTO-1A & SAY-10
-// See the README for more info
+// 这个例子在很大程度上受到了ronaldstoner的ESP32示例的启发
+// 基于chipik / _hexway / ECTO-1A＆SAY-10的先前工作
+// 详细信息请参阅README
 #include <Arduino.h>
 
 #include <BLEDevice.h>
@@ -9,42 +9,40 @@
 
 #include "devices.hpp"
 
-BLEAdvertising *pAdvertising;  // global variable
+BLEAdvertising *pAdvertising;
 uint32_t delayMilliseconds = 1000;
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting ESP32 BLE");
 
-  // This is specific to the AirM2M ESP32 board
+  // 这是特定于AirM2M ESP32板的
   // https://wiki.luatos.com/chips/esp32c3/board.html
   pinMode(12, OUTPUT);
   pinMode(13, OUTPUT);
 
   BLEDevice::init("AirPods 69");
 
-  // Create the BLE Server
+  // 创建BLE服务器
   BLEServer *pServer = BLEDevice::createServer();
   pAdvertising = pServer->getAdvertising();
 
-  // seems we need to init it with an address in setup() step.
+  // 似乎我们需要在setup()步骤中用一个地址初始化它。
   esp_bd_addr_t null_addr = {0xFE, 0xED, 0xC0, 0xFF, 0xEE, 0x69};
   pAdvertising->setDeviceAddress(null_addr, BLE_ADDR_TYPE_RANDOM);
 }
 
 void loop() {
-  // Turn lights on during "busy" part
+  // 在“繁忙”部分打开灯光
   digitalWrite(12, HIGH);
   digitalWrite(13, HIGH);
 
-  // First generate fake random MAC
+  // 首先生成虚假的随机MAC地址
   esp_bd_addr_t dummy_addr = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
   for (int i = 0; i < 6; i++){
     dummy_addr[i] = random(256);
 
-    // It seems for some reason first 4 bits
-    // Need to be high (aka 0b1111), so we 
-    // OR with 0xF0
+  // 似乎由于某种原因，前4位需要是高位（即0b1111），因此我们用0xF0进行OR运算。
     if (i == 0){
       dummy_addr[i] |= 0xF0;
     }
